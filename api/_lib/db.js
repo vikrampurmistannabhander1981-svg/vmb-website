@@ -17,6 +17,18 @@ async function ensureSchema() {
       created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
     );
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_branches (
+      id          TEXT PRIMARY KEY,
+      name        TEXT NOT NULL,
+      area        TEXT,
+      address     TEXT,
+      phone       TEXT,
+      sort_order  INTEGER NOT NULL DEFAULT 0,
+      active      BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `;
   schemaReady = true;
 }
 

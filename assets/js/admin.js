@@ -33,7 +33,17 @@
     loginScreen.style.display = 'none';
     adminScreen.style.display = 'block';
     loadProducts();
+    loadBranches();
   }
+
+  document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.getAttribute('data-tab') + 'Panel').classList.add('active');
+    });
+  });
 
   loginBtn.addEventListener('click', function () {
     loginErr.textContent = '';
@@ -184,6 +194,108 @@
     fetch('/api/products?id=' + encodeURIComponent(id), { method: 'DELETE' })
       .then(function (r) { return r.json(); })
       .then(function () { loadProducts(); });
+  }
+
+  // ================= ব্রাঞ্চ ব্যবস্থাপনা =================
+  var branchRows = document.getElementById('branchRows');
+  var branchListErr = document.getElementById('branchListErr');
+  var addBranchBtn = document.getElementById('addBranchBtn');
+  var branchModalBg = document.getElementById('branchModalBg');
+  var branchModalTitle = document.getElementById('branchModalTitle');
+  var branchFormErr = document.getElementById('branchFormErr');
+  var branchCancelBtn = document.getElementById('branchCancelBtn');
+  var branchSaveBtn = document.getElementById('branchSaveBtn');
+  var bName = document.getElementById('bName');
+  var bArea = document.getElementById('bArea');
+  var bAddress = document.getElementById('bAddress');
+  var bPhone = document.getElementById('bPhone');
+  var bActive = document.getElementById('bActive');
+  var editingBranchId = null;
+
+  function loadBranches() {
+    branchListErr.textContent = '';
+    fetch('/api/branches?all=1')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { renderBranchRows(d.branches || []); })
+      .catch(function () { branchListErr.textContent = 'তালিকা লোড করা যায়নি।'; });
+  }
+
+  function renderBranchRows(branches) {
+    branchRows.innerHTML = '';
+    if (!branches.length) {
+      branchRows.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">এখনো অ্যাডমিন থেকে কোনো ব্রাঞ্চ যোগ করা হয়নি।</td></tr>';
+      return;
+    }
+    branches.forEach(function (b) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><b>' + escapeHtml(b.name) + '</b></td>' +
+        '<td>' + escapeHtml(b.area || '') + '</td>' +
+        '<td style="max-width:220px;">' + escapeHtml(b.address || '') + '</td>' +
+        '<td>' + escapeHtml(b.phone || '') + '</td>' +
+        '<td>' + (b.active ? '✅ Active' : '⛔ Hidden') + '</td>' +
+        '<td class="row-actions"></td>';
+      var actionsTd = tr.querySelector('.row-actions');
+      var editBtn = document.createElement('button');
+      editBtn.className = 'btn-outline-s';
+      editBtn.textContent = 'এডিট';
+      editBtn.addEventListener('click', function () { openBranchModal(b); });
+      var delBtn = document.createElement('button');
+      delBtn.className = 'btn-outline-s';
+      delBtn.textContent = 'ডিলিট';
+      delBtn.addEventListener('click', function () { deleteBranch(b.id, b.name); });
+      actionsTd.appendChild(editBtn);
+      actionsTd.appendChild(delBtn);
+      branchRows.appendChild(tr);
+    });
+  }
+
+  function openBranchModal(branch) {
+    branchFormErr.textContent = '';
+    editingBranchId = branch ? branch.id : null;
+    branchModalTitle.textContent = branch ? 'ব্রাঞ্চ এডিট করুন' : 'নতুন ব্রাঞ্চ';
+    bName.value = branch ? branch.name : '';
+    bArea.value = branch ? (branch.area || '') : '';
+    bAddress.value = branch ? (branch.address || '') : '';
+    bPhone.value = branch ? (branch.phone || '') : '';
+    bActive.checked = branch ? !!branch.active : true;
+    branchModalBg.classList.add('open');
+  }
+  function closeBranchModal() { branchModalBg.classList.remove('open'); }
+
+  addBranchBtn.addEventListener('click', function () { openBranchModal(null); });
+  branchCancelBtn.addEventListener('click', closeBranchModal);
+
+  branchSaveBtn.addEventListener('click', function () {
+    branchFormErr.textContent = '';
+    if (!bName.value.trim()) { branchFormErr.textContent = 'ব্রাঞ্চের নাম আবশ্যক।'; return; }
+    var payload = {
+      name: bName.value.trim(),
+      area: bArea.value.trim(),
+      address: bAddress.value.trim(),
+      phone: bPhone.value.trim(),
+      active: bActive.checked
+    };
+    var method = editingBranchId ? 'PUT' : 'POST';
+    if (editingBranchId) payload.id = editingBranchId;
+    fetch('/api/branches', {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) { branchFormErr.textContent = res.d.error || 'সেভ করা যায়নি।'; return; }
+        closeBranchModal();
+        loadBranches();
+      })
+      .catch(function () { branchFormErr.textContent = 'নেটওয়ার্ক সমস্যা।'; });
+  });
+
+  function deleteBranch(id, name) {
+    if (!confirm('"' + name + '" ব্রাঞ্চ ডিলিট করবেন?')) return;
+    fetch('/api/branches?id=' + encodeURIComponent(id), { method: 'DELETE' })
+      .then(function (r) { return r.json(); })
+      .then(function () { loadBranches(); });
   }
 
   // পেজ লোডে সেশন আছে কিনা চেক (products?all=1 কল করেই বোঝা যায়)

@@ -35,6 +35,11 @@
   .img-preview{width:100%;height:160px;object-fit:cover;border-radius:10px;border:1px solid var(--line);margin-bottom:10px;background:#f4ede1;}
   .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
   .muted-note{font-size:12.5px;color:var(--muted);margin-top:6px;}
+  .tabs{display:flex;gap:10px;margin-bottom:24px;border-bottom:1px solid var(--line);}
+  .tab-btn{background:none;border:none;padding:10px 4px;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-right:20px;}
+  .tab-btn.active{color:var(--navy);border-bottom-color:var(--gold);}
+  .panel{display:none;}
+  .panel.active{display:block;}
 </style>
 </head>
 <body>
@@ -56,15 +61,34 @@
     <img src="assets/img/logo.png" alt="VMB">
     <button class="btn-outline-s" id="logoutBtn">লগআউট</button>
   </div>
-  <div class="toolbar">
-    <h2 style="margin:0;font-size:20px;">মিষ্টি তালিকা</h2>
-    <button class="btn-gold-s" id="addBtn">+ নতুন মিষ্টি যোগ করুন</button>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="products">মিষ্টি</button>
+    <button class="tab-btn" data-tab="branches">ব্রাঞ্চ</button>
   </div>
-  <p id="listErr" class="err"></p>
-  <table>
-    <thead><tr><th>ছবি</th><th>নাম</th><th>ক্যাটাগরি</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
-    <tbody id="productRows"></tbody>
-  </table>
+
+  <div class="panel active" id="productsPanel">
+    <div class="toolbar">
+      <h2 style="margin:0;font-size:20px;">মিষ্টি তালিকা</h2>
+      <button class="btn-gold-s" id="addBtn">+ নতুন মিষ্টি যোগ করুন</button>
+    </div>
+    <p id="listErr" class="err"></p>
+    <table>
+      <thead><tr><th>ছবি</th><th>নাম</th><th>ক্যাটাগরি</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+      <tbody id="productRows"></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="branchesPanel">
+    <div class="toolbar">
+      <h2 style="margin:0;font-size:20px;">ব্রাঞ্চ তালিকা</h2>
+      <button class="btn-gold-s" id="addBranchBtn">+ নতুন ব্রাঞ্চ যোগ করুন</button>
+    </div>
+    <p id="branchListErr" class="err"></p>
+    <table>
+      <thead><tr><th>নাম</th><th>এলাকা</th><th>ঠিকানা</th><th>ফোন</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+      <tbody id="branchRows"></tbody>
+    </table>
+  </div>
 </div>
 
 <div class="modal-bg" id="modalBg">
@@ -106,6 +130,36 @@
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn-outline-s" id="cancelBtn">বাতিল</button>
       <button class="btn" id="saveBtn">সেভ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="branchModalBg">
+  <div class="modal">
+    <h2 id="branchModalTitle">নতুন ব্রাঞ্চ</h2>
+    <p id="branchFormErr" class="err"></p>
+    <div class="field">
+      <label>ব্রাঞ্চের নাম *</label>
+      <input type="text" id="bName" placeholder="যেমন: উত্তরা">
+    </div>
+    <div class="field">
+      <label>এলাকা / থানা</label>
+      <input type="text" id="bArea" placeholder="যেমন: উত্তরা">
+    </div>
+    <div class="field">
+      <label>পূর্ণ ঠিকানা</label>
+      <textarea id="bAddress" placeholder="বাড়ি/রোড/এলাকা/ঢাকা-পোস্ট কোড"></textarea>
+    </div>
+    <div class="field">
+      <label>ফোন নম্বর</label>
+      <input type="text" id="bPhone" placeholder="01XXXXXXXXX">
+    </div>
+    <div class="field">
+      <label><input type="checkbox" id="bActive" checked style="width:auto;margin-right:6px;">সাইটে দেখাবে (Active)</label>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn-outline-s" id="branchCancelBtn">বাতিল</button>
+      <button class="btn" id="branchSaveBtn">সেভ করুন</button>
     </div>
   </div>
 </div>

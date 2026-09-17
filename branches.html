@@ -128,20 +128,32 @@
     noResultEl.style.display = list.length === 0 ? 'block' : 'none';
   }
 
+  var ALL_BRANCHES = VMB_BRANCHES;
+
   function filterBranches(q){
     q = q.trim().toLowerCase();
-    if (!q) return VMB_BRANCHES;
-    return VMB_BRANCHES.filter(function(b){
+    if (!q) return ALL_BRANCHES;
+    return ALL_BRANCHES.filter(function(b){
       return b.name.toLowerCase().indexOf(q) !== -1 ||
              b.area.toLowerCase().indexOf(q) !== -1 ||
              b.address.toLowerCase().indexOf(q) !== -1;
     });
   }
 
-  render(VMB_BRANCHES);
+  render(ALL_BRANCHES);
   searchEl.addEventListener('input', function(){
     render(filterBranches(searchEl.value));
   });
+
+  // অ্যাডমিন প্যানেল থেকে যোগ করা ব্রাঞ্চ থাকলে সেগুলো তালিকায় যোগ হবে
+  fetch('/api/branches').then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
+    if (!data || !data.branches || !data.branches.length) return;
+    var extra = data.branches.map(function(b){
+      return { name: b.name, area: b.area || '', address: b.address || '', phone: b.phone || '' };
+    });
+    ALL_BRANCHES = VMB_BRANCHES.concat(extra);
+    render(filterBranches(searchEl.value));
+  }).catch(function(){ /* fallback থেকে যাবে */ });
 </script>
 </body>
 </html>
