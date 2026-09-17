@@ -68,7 +68,7 @@
 
     <div class="sweet-grid fade-group" id="sweetGrid">
       <div class="sweet-card" data-cat="normal">
-        <img src="assets/img/kanchagolla.jpg" alt="কাঁচাগোল্লা">
+        <div class="imgwrap"><img src="assets/img/kanchagolla.jpg" alt="কাঁচাগোল্লা"></div>
         <div class="body">
           <div class="tag">নারকেল মিষ্টি</div>
           <h3>কাঁচাগোল্লা</h3>
@@ -77,7 +77,7 @@
         </div>
       </div>
       <div class="sweet-card" data-cat="special">
-        <img src="assets/img/khirsha.jpg" alt="ক্ষীরসা">
+        <div class="imgwrap"><img src="assets/img/khirsha.jpg" alt="ক্ষীরসা"></div>
         <div class="body">
           <div class="tag">ঐতিহ্যবাহী</div>
           <h3>ক্ষীরসা</h3>
@@ -86,7 +86,7 @@
         </div>
       </div>
       <div class="sweet-card" data-cat="special">
-        <img src="assets/img/jilapi.jpg" alt="জিলাপি">
+        <div class="imgwrap"><img src="assets/img/jilapi.jpg" alt="জিলাপি"></div>
         <div class="body">
           <div class="tag">গরম-গরম</div>
           <h3>জিলাপি</h3>
@@ -95,7 +95,7 @@
         </div>
       </div>
       <div class="sweet-card" data-cat="sondesh">
-        <img src="assets/img/sondesh.jpg" alt="সন্দেশ">
+        <div class="imgwrap"><img src="assets/img/sondesh.jpg" alt="সন্দেশ"></div>
         <div class="body">
           <div class="tag">সিগনেচার</div>
           <h3>সন্দেশ</h3>
@@ -104,7 +104,7 @@
         </div>
       </div>
       <div class="sweet-card" data-cat="normal">
-        <img src="assets/img/chomchom.jpg" alt="চমচম">
+        <div class="imgwrap"><img src="assets/img/chomchom.jpg" alt="চমচম"></div>
         <div class="body">
           <div class="tag">ক্লাসিক</div>
           <h3>চমচম</h3>
@@ -113,7 +113,7 @@
         </div>
       </div>
       <div class="sweet-card" data-cat="laddu">
-        <img src="assets/img/laddu.jpg" alt="লাড্ডু">
+        <div class="imgwrap"><img src="assets/img/laddu.jpg" alt="লাড্ডু"></div>
         <div class="body">
           <div class="tag">উৎসব স্পেশাল</div>
           <h3>লাড্ডু</h3>
@@ -205,7 +205,7 @@
       var card = document.createElement('div');
       card.className = 'sweet-card';
       card.setAttribute('data-cat', p.category || 'normal');
-      var img = p.image_url ? '<img src="' + p.image_url + '" alt="' + escapeAttr(p.title) + '">' : '';
+      var img = p.image_url ? '<div class="imgwrap"><img src="' + p.image_url + '" alt="' + escapeAttr(p.title) + '"></div>' : '';
       card.innerHTML = img +
         '<div class="body">' +
           (p.subtitle ? '<div class="tag">' + escapeHtml(p.subtitle) + '</div>' : '') +
