@@ -193,6 +193,32 @@
       document.getElementById('emptyNote').style.display = visibleCount === 0 ? 'block' : 'none';
     });
   });
+
+  // অ্যাডমিন প্যানেল থেকে যোগ করা মিষ্টি থাকলে সেগুলো দিয়ে গ্রিড বদলে দেওয়া হয়,
+  // না থাকলে/API না চললে উপরের ডিফল্ট মিষ্টিগুলোই দেখা যাবে।
+  fetch('/api/products').then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
+    if (!data || !data.products || !data.products.length) return;
+    var grid = document.getElementById('sweetGrid');
+    var emptyNote = document.getElementById('emptyNote');
+    grid.querySelectorAll('.sweet-card').forEach(function(c){ c.remove(); });
+    data.products.forEach(function(p){
+      var card = document.createElement('div');
+      card.className = 'sweet-card';
+      card.setAttribute('data-cat', p.category || 'normal');
+      var img = p.image_url ? '<img src="' + p.image_url + '" alt="' + escapeAttr(p.title) + '">' : '';
+      card.innerHTML = img +
+        '<div class="body">' +
+          (p.subtitle ? '<div class="tag">' + escapeHtml(p.subtitle) + '</div>' : '') +
+          '<h3>' + escapeHtml(p.title) + '</h3>' +
+          (p.description ? '<p>' + escapeHtml(p.description) + '</p>' : '') +
+          '<a class="link" href="tel:01775525296">অর্ডারের জন্য কল করুন →</a>' +
+        '</div>';
+      grid.insertBefore(card, emptyNote);
+    });
+  }).catch(function(){ /* fallback থেকে যাবে */ });
+
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function escapeAttr(s){ return escapeHtml(s); }
 </script>
 </body>
 </html>

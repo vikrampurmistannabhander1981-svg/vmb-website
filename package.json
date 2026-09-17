@@ -1,0 +1,9 @@
+{
+  "name": "vmb-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "বিক্রমপুর মিষ্টান্ন ভান্ডার — পাবলিক ওয়েবসাইট + সহজ অ্যাডমিন প্যানেল",
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0"
+  }
+}
