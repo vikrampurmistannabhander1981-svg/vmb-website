@@ -39,22 +39,43 @@
   </div>
 </header>
 
-<div class="pill-page-head">
+<section class="branch-hero">
+  <img class="bg" src="assets/img/hero-2.jpg" alt="">
+  <div class="overlay"></div>
   <div class="wrap">
-    <div class="eyebrow">OUR BRANCHES</div>
-    <h1 class="disp">সব ব্রাঞ্চ</h1>
+    <div class="eyebrow" style="justify-content:center;">OUR BRANCHES</div>
+    <h1 class="disp">ঢাকাজুড়ে <em>৩৮টি</em> ব্রাঞ্চ</h1>
     <p>আপনার কাছের বিক্রমপুর মিষ্টান্ন ভান্ডার শাখাটি খুঁজে নিন</p>
-  </div>
-</div>
-
-<section class="section">
-  <div class="wrap">
-    <div class="branch-tools">
-      <input type="text" id="branchSearch" placeholder="এলাকা, ঠিকানা বা ব্রাঞ্চের নাম দিয়ে খুঁজুন...">
+    <div class="branch-search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" id="branchSearch" placeholder="এলাকা, রোড বা ব্রাঞ্চের নাম লিখুন — যেমন: মিরপুর, ধানমন্ডি">
     </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:44px;">
+  <div class="wrap">
+    <div class="area-chips" id="areaChips"></div>
     <div class="branch-count" id="branchCount"></div>
     <div class="branch-list" id="branchList"></div>
-    <p id="noResult" style="display:none;text-align:center;color:var(--muted);padding:30px 0;">কোনো ব্রাঞ্চ পাওয়া যায়নি। অন্য নাম দিয়ে খুঁজে দেখুন, অথবা কল করুন <a href="tel:01775525296" style="color:var(--navy);font-weight:700;">০১৭৭৫৫২৫২৯৬</a></p>
+    <div id="noResult" class="branch-empty" style="display:none;">
+      <div class="disp" style="font-size:22px;color:var(--navy);margin-bottom:8px;">কোনো ব্রাঞ্চ পাওয়া যায়নি</div>
+      <p style="margin:0 0 16px;color:var(--muted);">অন্য নাম দিয়ে খুঁজে দেখুন, অথবা আমাদের কল করুন</p>
+      <a href="tel:01775525296" class="btn-gold">০১৭৭৫৫২৫২৯৬</a>
+    </div>
+  </div>
+</section>
+
+<section class="branch-band">
+  <div class="wrap">
+    <div class="left">
+      <span class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E3B667" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+      <div>
+        <h3 class="disp">আপনার এলাকায় ব্রাঞ্চ খুঁজে পাচ্ছেন না?</h3>
+        <span>কল করুন — কাছের ব্রাঞ্চ বা হোম ডেলিভারির ব্যবস্থা করে দেব</span>
+      </div>
+    </div>
+    <a href="tel:01775525296" class="btn-gold">০১৭৭৫৫২৫২৯৬</a>
   </div>
 </section>
 
@@ -104,48 +125,91 @@
   var countEl = document.getElementById('branchCount');
   var noResultEl = document.getElementById('noResult');
   var searchEl = document.getElementById('branchSearch');
+  var chipsEl = document.getElementById('areaChips');
+  var activeArea = 'all';
+
+  // ডাটায় এলাকার নাম নানা বানানে আছে — একটা পরিষ্কার লেবেলে মেলানো হয়
+  var AREA_LABELS = {
+    'mirpur':'মিরপুর','dhanmondi':'ধানমন্ডি','mohammadpur':'মোহাম্মদপুর','kalabagan':'কলাবাগান',
+    'adabor':'আদাবর','motijheel':'মতিঝিল','wari':'ওয়ারী','bailey road':'বেইলি রোড',
+    'paltan thana':'পল্টন','sutrapur thana':'সূত্রাপুর','azimpur':'আজিমপুর','banasree':'বনশ্রী',
+    'kotwali thana (dhaka)':'চকবাজার','new market thana':'হাতিরপুল','tejgaon':'তেজগাঁও',
+    'lalbagh thana':'লালবাগ','ramna thana':'মালিবাগ','khilkhet':'খিলক্ষেত','rampura':'রামপুরা',
+    'ecb chattar':'ইসিবি চত্বর'
+  };
+  function areaKey(a){ return String(a||'').trim().toLowerCase(); }
+  function areaLabel(a){ return AREA_LABELS[areaKey(a)] || a; }
+  function bn(n){ return String(n).replace(/[0-9]/g, function(d){ return '০১২৩৪৫৬৭৮৯'[d]; }); }
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function isHQ(b){ return /head office|প্রধান/i.test(b.name) || /^119,s*kalabagan/i.test(b.address); }
 
   function pinIcon(){
-    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8842E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8842E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:3px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
   }
-  function phoneIcon(){
-    return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E1423" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+
+  function buildChips(){
+    var counts = {};
+    ALL_BRANCHES.forEach(function(b){ var k = areaKey(b.area); counts[k] = (counts[k]||0) + 1; });
+    var keys = Object.keys(counts).filter(function(k){ return counts[k] >= 2; })
+      .sort(function(a,b){ return counts[b]-counts[a]; });
+    var html = '<button class="area-chip' + (activeArea==='all'?' active':'') + '" data-area="all">সব <span>' + bn(ALL_BRANCHES.length) + '</span></button>';
+    keys.forEach(function(k){
+      html += '<button class="area-chip' + (activeArea===k?' active':'') + '" data-area="' + esc(k) + '">' + esc(areaLabel(k)) + ' <span>' + bn(counts[k]) + '</span></button>';
+    });
+    html += '<button class="area-chip' + (activeArea==='other'?' active':'') + '" data-area="other">অন্যান্য</button>';
+    chipsEl.innerHTML = html;
+    chipsEl.querySelectorAll('.area-chip').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        activeArea = btn.getAttribute('data-area');
+        chipsEl.querySelectorAll('.area-chip').forEach(function(c){ c.classList.remove('active'); });
+        btn.classList.add('active');
+        render(applyFilters());
+      });
+    });
   }
 
   function render(list){
     listEl.innerHTML = '';
-    list.forEach(function(b){
+    list.forEach(function(b, i){
       var mapUrl = 'https://www.google.com/maps/search/' + encodeURIComponent(b.address);
+      var tel = String(b.phone||'').replace(/s/g,'');
       var card = document.createElement('div');
-      card.className = 'branch-card';
+      card.className = 'branch-card' + (isHQ(b) ? ' hq' : '');
+      card.style.animationDelay = Math.min(i, 12) * 40 + 'ms';
       card.innerHTML =
-        '<div class="area">' + b.area + '</div>' +
-        '<h3>' + b.name + '</h3>' +
-        '<div class="addr">' + pinIcon() + '<span>' + b.address + '</span></div>' +
-        '<div class="phone">' + phoneIcon() + '<a href="tel:' + b.phone.replace(/\s/g,'') + '">' + b.phone + '</a></div>' +
-        '<a href="' + mapUrl + '" target="_blank" rel="noopener" class="link" style="display:inline-block;margin-top:10px;color:var(--navy);font-weight:700;font-size:13px;">মানচিত্রে দেখুন →</a>';
+        '<div class="top"><span class="area">' + esc(areaLabel(b.area)) + '</span>' + (isHQ(b) ? '<span class="hq-badge">প্রধান কার্যালয়</span>' : '') + '</div>' +
+        '<h3>' + esc(b.name) + '</h3>' +
+        '<div class="addr">' + pinIcon() + '<span>' + esc(b.address) + '</span></div>' +
+        '<div class="actions">' +
+          (tel ? '<a class="call" href="tel:' + esc(tel) + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' + esc(b.phone) + '</a>' : '') +
+          '<a class="map" href="' + mapUrl + '" target="_blank" rel="noopener">মানচিত্র ↗</a>' +
+        '</div>';
       listEl.appendChild(card);
     });
-    countEl.textContent = list.length + 'টি ব্রাঞ্চ পাওয়া গেছে';
+    countEl.textContent = list.length ? bn(list.length) + 'টি ব্রাঞ্চ' : '';
     noResultEl.style.display = list.length === 0 ? 'block' : 'none';
   }
 
   var ALL_BRANCHES = VMB_BRANCHES;
 
-  function filterBranches(q){
-    q = q.trim().toLowerCase();
-    if (!q) return ALL_BRANCHES;
+  function applyFilters(){
+    var q = searchEl.value.trim().toLowerCase();
+    var frequent = {};
+    ALL_BRANCHES.forEach(function(b){ var k = areaKey(b.area); frequent[k] = (frequent[k]||0)+1; });
     return ALL_BRANCHES.filter(function(b){
+      var k = areaKey(b.area);
+      if (activeArea === 'other' && frequent[k] >= 2) return false;
+      if (activeArea !== 'all' && activeArea !== 'other' && k !== activeArea) return false;
+      if (!q) return true;
       return b.name.toLowerCase().indexOf(q) !== -1 ||
-             b.area.toLowerCase().indexOf(q) !== -1 ||
-             b.address.toLowerCase().indexOf(q) !== -1;
+             k.indexOf(q) !== -1 || areaLabel(b.area).indexOf(q) !== -1 ||
+             String(b.address).toLowerCase().indexOf(q) !== -1;
     });
   }
 
+  buildChips();
   render(ALL_BRANCHES);
-  searchEl.addEventListener('input', function(){
-    render(filterBranches(searchEl.value));
-  });
+  searchEl.addEventListener('input', function(){ render(applyFilters()); });
 
   // অ্যাডমিন প্যানেল থেকে যোগ করা ব্রাঞ্চ থাকলে সেগুলো তালিকায় যোগ হবে
   fetch('/api/branches').then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
@@ -154,7 +218,8 @@
       return { name: b.name, area: b.area || '', address: b.address || '', phone: b.phone || '' };
     });
     ALL_BRANCHES = VMB_BRANCHES.concat(extra);
-    render(filterBranches(searchEl.value));
+    buildChips();
+    render(applyFilters());
   }).catch(function(){ /* fallback থেকে যাবে */ });
 </script>
 </body>
