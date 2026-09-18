@@ -55,6 +55,7 @@ async function ensureSchema() {
   await sql`ALTER TABLE site_branches ADD COLUMN IF NOT EXISTS open_time TEXT;`;
   await sql`ALTER TABLE site_branches ADD COLUMN IF NOT EXISTS close_time TEXT;`;
   await seedDefaultProducts();
+  await seedExtraProducts();
   schemaReady = true;
 }
 
@@ -80,6 +81,18 @@ async function seedDefaultProducts() {
     `;
   }
   await sql`INSERT INTO site_settings (key, value) VALUES ('seeded_products', '1') ON CONFLICT (key) DO NOTHING`;
+}
+
+// পরে যোগ হওয়া দোকানের আসল ছবির মিষ্টি — একবারই ঢোকে, অ্যাডমিন মুছে দিলে আর ফিরবে না
+async function seedExtraProducts() {
+  const { rows } = await sql`SELECT value FROM site_settings WHERE key = 'seeded_products_v2'`;
+  if (rows.length) return;
+  await sql`
+    INSERT INTO products (id, title, subtitle, category, description, image_url, sort_order, active, featured)
+    VALUES ('seed_rasmalai', 'রসমালাই', 'জাফরান-পেস্তা', 'special', 'ঘন জাফরানি দুধে ভেজানো নরম ছানার রসমালাই, উপরে পেস্তা-বাদাম — মুখে দিলেই গলে যায়।', '/assets/img/rasmalai.jpg', 7, TRUE, TRUE)
+    ON CONFLICT (id) DO NOTHING
+  `;
+  await sql`INSERT INTO site_settings (key, value) VALUES ('seeded_products_v2', '1') ON CONFLICT (key) DO NOTHING`;
 }
 
 module.exports = { sql, ensureSchema };
