@@ -1,0 +1,20 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/categories", "destination": "/sweets", "permanent": true },
+    { "source": "/category/:slug*", "destination": "/sweets", "permanent": true },
+    { "source": "/branch/:slug*", "destination": "/branches", "permanent": true },
+    { "source": "/index", "destination": "/", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/admin",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    }
+  ]
+}
