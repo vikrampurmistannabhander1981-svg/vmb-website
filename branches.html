@@ -49,9 +49,31 @@
     <div class="branch-search">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input type="text" id="branchSearch" placeholder="এলাকা, রোড বা ব্রাঞ্চের নাম লিখুন — যেমন: মিরপুর, ধানমন্ডি">
+      <button type="button" class="locate-btn" id="locateBtn" title="আমার অবস্থান থেকে কাছের ব্রাঞ্চ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+        <span>কাছের ব্রাঞ্চ</span>
+      </button>
     </div>
+    <p class="locate-hint" id="locateHint"></p>
   </div>
 </section>
+
+<div class="nearest-banner" id="nearestBanner" style="display:none;">
+  <div class="wrap">
+    <div class="nb-left">
+      <span class="nb-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+      <div>
+        <div class="nb-label">আপনার সবচেয়ে কাছের ব্রাঞ্চ</div>
+        <div class="nb-name disp" id="nbName"></div>
+        <div class="nb-addr" id="nbAddr"></div>
+      </div>
+    </div>
+    <div class="nb-actions">
+      <a class="btn-gold" id="nbCall" href="#">কল করুন</a>
+      <a class="btn-outline" id="nbMap" href="#" target="_blank" rel="noopener" style="padding:11px 18px;font-size:14px;">রাস্তা দেখুন ↗</a>
+    </div>
+  </div>
+</div>
 
 <section class="section" style="padding-top:44px;">
   <div class="wrap">
@@ -141,7 +163,25 @@
   function areaLabel(a){ return AREA_LABELS[areaKey(a)] || a; }
   function bn(n){ return String(n).replace(/[0-9]/g, function(d){ return '০১২৩৪৫৬৭৮৯'[d]; }); }
   function esc(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function isHQ(b){ return /head office|প্রধান/i.test(b.name) || /^119,s*kalabagan/i.test(b.address); }
+  function isHQ(b){ return /head office|প্রধান/i.test(b.name) || /^119,\s*kalabagan/i.test(b.address); }
+
+  // ---- ব্যবহারকারীর অবস্থান থেকে দূরত্ব ----
+  var userPos = null;
+  function haversineKm(a, b){
+    var R = 6371, toRad = function(x){ return x * Math.PI / 180; };
+    var dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+    var s = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng/2) * Math.sin(dLng/2);
+    return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+  }
+  function distKm(b){
+    if (!userPos || typeof b.lat !== 'number' || typeof b.lng !== 'number') return null;
+    return haversineKm(userPos, b);
+  }
+  function fmtDist(km){
+    if (km == null) return '';
+    return km < 1 ? bn(Math.round(km * 1000)) + ' মিটার' : bn(km.toFixed(1)) + ' কিমি';
+  }
 
   function pinIcon(){
     return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8842E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:3px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
@@ -172,23 +212,78 @@
     listEl.innerHTML = '';
     list.forEach(function(b, i){
       var mapUrl = 'https://www.google.com/maps/search/' + encodeURIComponent(b.address);
-      var tel = String(b.phone||'').replace(/s/g,'');
+      var tel = String(b.phone||'').replace(/\s/g,'');
+      var d = distKm(b);
       var card = document.createElement('div');
-      card.className = 'branch-card' + (isHQ(b) ? ' hq' : '');
+      card.className = 'branch-card' + (isHQ(b) ? ' hq' : '') + (userPos && i === 0 && d != null ? ' nearest' : '');
       card.style.animationDelay = Math.min(i, 12) * 40 + 'ms';
+      var mapHref = userPos ? ('https://www.google.com/maps/dir/?api=1&origin=' + userPos.lat + ',' + userPos.lng + '&destination=' + encodeURIComponent(b.address)) : mapUrl;
       card.innerHTML =
-        '<div class="top"><span class="area">' + esc(areaLabel(b.area)) + '</span>' + (isHQ(b) ? '<span class="hq-badge">প্রধান কার্যালয়</span>' : '') + '</div>' +
+        '<div class="top"><span class="area">' + esc(areaLabel(b.area)) + '</span>' +
+          (isHQ(b) ? '<span class="hq-badge">প্রধান কার্যালয়</span>' : '') +
+          (d != null ? '<span class="dist">' + fmtDist(d) + '</span>' : '') +
+        '</div>' +
         '<h3>' + esc(b.name) + '</h3>' +
         '<div class="addr">' + pinIcon() + '<span>' + esc(b.address) + '</span></div>' +
         '<div class="actions">' +
           (tel ? '<a class="call" href="tel:' + esc(tel) + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' + esc(b.phone) + '</a>' : '') +
-          '<a class="map" href="' + mapUrl + '" target="_blank" rel="noopener">মানচিত্র ↗</a>' +
+          '<a class="map" href="' + mapHref + '" target="_blank" rel="noopener">' + (userPos ? 'রাস্তা ↗' : 'মানচিত্র ↗') + '</a>' +
         '</div>';
       listEl.appendChild(card);
     });
-    countEl.textContent = list.length ? bn(list.length) + 'টি ব্রাঞ্চ' : '';
+    countEl.textContent = list.length ? bn(list.length) + 'টি ব্রাঞ্চ' + (userPos ? ' — কাছের থেকে দূরের ক্রমে' : '') : '';
     noResultEl.style.display = list.length === 0 ? 'block' : 'none';
   }
+
+  function sortByDistance(list){
+    if (!userPos) return list;
+    return list.slice().sort(function(a, b){
+      var da = distKm(a), db = distKm(b);
+      if (da == null && db == null) return 0;
+      if (da == null) return 1;
+      if (db == null) return -1;
+      return da - db;
+    });
+  }
+
+  // ---- "কাছের ব্রাঞ্চ" বাটন ----
+  var locateBtn = document.getElementById('locateBtn');
+  var locateHint = document.getElementById('locateHint');
+  var nearestBanner = document.getElementById('nearestBanner');
+
+  function showNearest(){
+    var sorted = sortByDistance(ALL_BRANCHES).filter(function(b){ return distKm(b) != null; });
+    if (!sorted.length) return;
+    var n = sorted[0], d = distKm(n);
+    document.getElementById('nbName').textContent = n.name + ' — ' + fmtDist(d) + ' দূরে';
+    document.getElementById('nbAddr').textContent = n.address;
+    document.getElementById('nbCall').setAttribute('href', 'tel:' + String(n.phone||'').replace(/\s/g,''));
+    document.getElementById('nbMap').setAttribute('href', 'https://www.google.com/maps/dir/?api=1&origin=' + userPos.lat + ',' + userPos.lng + '&destination=' + encodeURIComponent(n.address));
+    nearestBanner.style.display = 'block';
+  }
+
+  locateBtn.addEventListener('click', function(){
+    if (!navigator.geolocation) { locateHint.textContent = 'আপনার ব্রাউজারে লোকেশন সাপোর্ট নেই।'; return; }
+    locateBtn.classList.add('busy');
+    locateHint.textContent = 'আপনার অবস্থান খোঁজা হচ্ছে…';
+    navigator.geolocation.getCurrentPosition(function(pos){
+      userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      locateBtn.classList.remove('busy');
+      locateBtn.classList.add('done');
+      locateHint.textContent = '';
+      activeArea = 'all';
+      searchEl.value = '';
+      buildChips();
+      render(applyFilters());
+      showNearest();
+      nearestBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, function(err){
+      locateBtn.classList.remove('busy');
+      locateHint.textContent = err.code === 1
+        ? 'লোকেশনের অনুমতি দেওয়া হয়নি — ব্রাউজারে অনুমতি দিয়ে আবার চেষ্টা করুন, অথবা উপরে এলাকার নাম লিখে খুঁজুন।'
+        : 'অবস্থান পাওয়া যায়নি — এলাকার নাম লিখে খুঁজে দেখুন।';
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  });
 
   var ALL_BRANCHES = VMB_BRANCHES;
 
@@ -196,7 +291,7 @@
     var q = searchEl.value.trim().toLowerCase();
     var frequent = {};
     ALL_BRANCHES.forEach(function(b){ var k = areaKey(b.area); frequent[k] = (frequent[k]||0)+1; });
-    return ALL_BRANCHES.filter(function(b){
+    return sortByDistance(ALL_BRANCHES.filter(function(b){
       var k = areaKey(b.area);
       if (activeArea === 'other' && frequent[k] >= 2) return false;
       if (activeArea !== 'all' && activeArea !== 'other' && k !== activeArea) return false;
@@ -204,7 +299,7 @@
       return b.name.toLowerCase().indexOf(q) !== -1 ||
              k.indexOf(q) !== -1 || areaLabel(b.area).indexOf(q) !== -1 ||
              String(b.address).toLowerCase().indexOf(q) !== -1;
-    });
+    }));
   }
 
   buildChips();
@@ -215,7 +310,9 @@
   fetch('/api/branches').then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
     if (!data || !data.branches || !data.branches.length) return;
     var extra = data.branches.map(function(b){
-      return { name: b.name, area: b.area || '', address: b.address || '', phone: b.phone || '' };
+      var o = { name: b.name, area: b.area || '', address: b.address || '', phone: b.phone || '' };
+      if (b.lat != null && b.lng != null && !isNaN(Number(b.lat)) && !isNaN(Number(b.lng))) { o.lat = Number(b.lat); o.lng = Number(b.lng); }
+      return o;
     });
     ALL_BRANCHES = VMB_BRANCHES.concat(extra);
     buildChips();

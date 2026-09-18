@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'GET' && !wantsAll) {
     const { rows } = await sql`
-      SELECT id, name, area, address, phone, sort_order, active
+      SELECT id, name, area, address, phone, sort_order, active, lat, lng
       FROM site_branches
       WHERE active = TRUE
       ORDER BY sort_order ASC, created_at ASC
@@ -29,7 +29,7 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'GET' && wantsAll) {
     const { rows } = await sql`
-      SELECT id, name, area, address, phone, sort_order, active
+      SELECT id, name, area, address, phone, sort_order, active, lat, lng
       FROM site_branches
       ORDER BY sort_order ASC, created_at ASC
     `;
@@ -45,21 +45,26 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'POST') {
     const id = newId();
-    const { name, area = '', address = '', phone = '', sortOrder = 0, active = true } = body;
+    const { name, area = '', address = '', phone = '', sortOrder = 0, active = true, lat = null, lng = null } = body;
+    const latV = (lat === '' || lat == null || isNaN(Number(lat))) ? null : Number(lat);
+    const lngV = (lng === '' || lng == null || isNaN(Number(lng))) ? null : Number(lng);
     if (!name) {
       res.status(400).json({ error: 'নাম (name) আবশ্যক।' });
       return;
     }
     await sql`
-      INSERT INTO site_branches (id, name, area, address, phone, sort_order, active)
-      VALUES (${id}, ${name}, ${area}, ${address}, ${phone}, ${sortOrder}, ${active})
+      INSERT INTO site_branches (id, name, area, address, phone, sort_order, active, lat, lng)
+      VALUES (${id}, ${name}, ${area}, ${address}, ${phone}, ${sortOrder}, ${active}, ${latV}, ${lngV})
     `;
     res.status(201).json({ ok: true, id });
     return;
   }
 
   if (req.method === 'PUT') {
-    const { id, name, area, address, phone, sortOrder, active } = body;
+    const { id, name, area, address, phone, sortOrder, active, lat, lng } = body;
+    const setGeo = Object.prototype.hasOwnProperty.call(body, 'lat');
+    const latV = (lat === '' || lat == null || isNaN(Number(lat))) ? null : Number(lat);
+    const lngV = (lng === '' || lng == null || isNaN(Number(lng))) ? null : Number(lng);
     if (!id) {
       res.status(400).json({ error: 'id আবশ্যক।' });
       return;
@@ -71,7 +76,9 @@ module.exports = async function handler(req, res) {
         address = COALESCE(${address}, address),
         phone = COALESCE(${phone}, phone),
         sort_order = COALESCE(${sortOrder}, sort_order),
-        active = COALESCE(${active}, active)
+        active = COALESCE(${active}, active),
+        lat = CASE WHEN ${setGeo} THEN ${latV}::double precision ELSE lat END,
+        lng = CASE WHEN ${setGeo} THEN ${lngV}::double precision ELSE lng END
       WHERE id = ${id}
     `;
     res.status(200).json({ ok: true });

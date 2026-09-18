@@ -222,6 +222,8 @@
   var bAddress = document.getElementById('bAddress');
   var bPhone = document.getElementById('bPhone');
   var bActive = document.getElementById('bActive');
+  var bLat = document.getElementById('bLat');
+  var bLng = document.getElementById('bLng');
   var editingBranchId = null;
 
   function loadBranches() {
@@ -271,6 +273,8 @@
     bAddress.value = branch ? (branch.address || '') : '';
     bPhone.value = branch ? (branch.phone || '') : '';
     bActive.checked = branch ? !!branch.active : true;
+    bLat.value = (branch && branch.lat != null) ? branch.lat : '';
+    bLng.value = (branch && branch.lng != null) ? branch.lng : '';
     branchModalBg.classList.add('open');
   }
   function closeBranchModal() { branchModalBg.classList.remove('open'); }
@@ -286,7 +290,9 @@
       area: bArea.value.trim(),
       address: bAddress.value.trim(),
       phone: bPhone.value.trim(),
-      active: bActive.checked
+      active: bActive.checked,
+      lat: bLat.value.trim() === '' ? null : Number(bLat.value.trim()),
+      lng: bLng.value.trim() === '' ? null : Number(bLng.value.trim())
     };
     var method = editingBranchId ? 'PUT' : 'POST';
     if (editingBranchId) payload.id = editingBranchId;

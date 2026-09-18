@@ -237,6 +237,27 @@ footer.site .links a:hover{color:var(--gold);}
 .branch-search input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-family:inherit;font-size:15.5px;padding:12px 8px;}
 .branch-search input::placeholder{color:rgba(255,255,255,.6);}
 
+.locate-btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s ease;}
+.locate-btn:hover{background:#a5762a;transform:translateY(-1px);}
+.locate-btn.busy{opacity:.7;pointer-events:none;}
+.locate-btn.busy svg{animation:spin 1s linear infinite;}
+.locate-btn.done{background:#2F6F4E;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.locate-hint{margin:12px 0 0;color:#E3B667;font-size:13.5px;min-height:18px;}
+
+.nearest-banner{background:linear-gradient(135deg,#6E1423,#4E0E19);color:#fff;}
+.nearest-banner .wrap{padding:26px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.nearest-banner .nb-left{display:flex;align-items:center;gap:16px;}
+.nearest-banner .nb-icon{width:52px;height:52px;border-radius:50%;background:rgba(184,132,46,.22);color:#E3B667;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nearest-banner .nb-label{color:#E3B667;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
+.nearest-banner .nb-name{font-size:22px;font-weight:600;margin:2px 0;}
+.nearest-banner .nb-addr{color:#D9CFC0;font-size:13.5px;}
+.nearest-banner .nb-actions{display:flex;gap:10px;flex-wrap:wrap;}
+
+.branch-card .dist{margin-left:auto;background:#EAF3EE;color:#2F6F4E;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.branch-card.nearest{border-color:#2F6F4E;box-shadow:0 0 0 3px rgba(47,111,78,.12);}
+.branch-card.nearest .dist{background:#2F6F4E;color:#fff;}
+
 .area-chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:26px;}
 .area-chip{border:1px solid var(--line);background:#fff;padding:9px 16px;border-radius:999px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink);transition:all .18s ease;display:inline-flex;align-items:center;gap:7px;}
 .area-chip span{background:var(--gold-soft);color:var(--gold);font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;}
