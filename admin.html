@@ -121,6 +121,16 @@
     </div>
 
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:18px;">
+      <h3 style="margin:0 0 6px;font-size:15px;">ব্রাঞ্চ খোলা/বন্ধের সময়</h3>
+      <div class="muted-note" style="margin:0 0 14px;">সব ব্রাঞ্চের জন্য একসাথে। কোনো ব্রাঞ্চের সময় আলাদা হলে "ব্রাঞ্চ" ট্যাবে সেই ব্রাঞ্চ এডিট করে আলাদা সময় দিন। ফাঁকা রাখলে সাইটে সময় দেখাবে না।</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field"><label>খোলার সময়</label><input type="time" id="sHoursOpen"></div>
+        <div class="field"><label>বন্ধের সময়</label><input type="time" id="sHoursClose"></div>
+      </div>
+      <div class="field"><label>নোট (ঐচ্ছিক)</label><input type="text" id="sHoursNote" placeholder="যেমন: সপ্তাহের ৭ দিন খোলা"></div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:18px;">
       <h3 style="margin:0 0 14px;font-size:15px;">সোশ্যাল মিডিয়া (লিংক দিলে ফুটারে আইকন দেখাবে)</h3>
       <div class="field"><label>Facebook পেজ লিংক</label><input type="text" id="sFacebook" placeholder="https://facebook.com/..."></div>
       <div class="field"><label>Instagram লিংক</label><input type="text" id="sInstagram" placeholder="https://instagram.com/..."></div>
@@ -277,6 +287,11 @@
         <input type="text" id="bLng" placeholder="90.3840" inputmode="decimal">
       </div>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="field"><label>খোলার সময় (ঐচ্ছিক)</label><input type="time" id="bOpen"></div>
+      <div class="field"><label>বন্ধের সময় (ঐচ্ছিক)</label><input type="time" id="bClose"></div>
+    </div>
+    <div class="muted-note" style="margin:-8px 0 14px;">ফাঁকা রাখলে সেটিংসের সাধারণ সময়সূচি প্রযোজ্য হবে।</div>
     <div class="muted-note" style="margin:-8px 0 14px;">"কাছের ব্রাঞ্চ" ফিচারে দূরত্ব দেখাতে লাগে। Google Maps-এ দোকানের উপর right-click করলে যে দুটো সংখ্যা আসে (যেমন 23.7455, 90.3840), সেটাই বসান।</div>
     <div class="field">
       <label><input type="checkbox" id="bActive" checked style="width:auto;margin-right:6px;">সাইটে দেখাবে (Active)</label>

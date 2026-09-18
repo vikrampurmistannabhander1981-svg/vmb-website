@@ -5,7 +5,8 @@ const ALLOWED_KEYS = [
   'phone', 'email', 'address',
   'topbar_1', 'topbar_2', 'topbar_3',
   'facebook', 'instagram', 'whatsapp',
-  'about_intro', 'about_history', 'credit'
+  'about_intro', 'about_history', 'credit',
+  'hours_open', 'hours_close', 'hours_note'
 ];
 
 module.exports = async function handler(req, res) {

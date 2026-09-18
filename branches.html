@@ -183,6 +183,38 @@
     return km < 1 ? bn(Math.round(km * 1000)) + ' মিটার' : bn(km.toFixed(1)) + ' কিমি';
   }
 
+  // ---- খোলা/বন্ধের সময় (ডিফল্ট সকাল ৮টা – রাত ১১টা; অ্যাডমিন সেটিংসে বদলানো যায়) ----
+  var HOURS = { open: '08:00', close: '23:00', note: '' };
+  function toMin(t){ var p = String(t||'').split(':'); return (+p[0]) * 60 + (+(p[1]||0)); }
+  function fmtTime(t){
+    var m = toMin(t), h = Math.floor(m / 60), mm = m % 60, h12 = h % 12 || 12;
+    var part = h < 4 ? 'রাত' : h < 12 ? 'সকাল' : h < 16 ? 'দুপুর' : h < 18 ? 'বিকাল' : h < 20 ? 'সন্ধ্যা' : 'রাত';
+    return part + ' ' + bn(h12) + (mm ? ':' + bn(String(mm).padStart(2,'0')) : 'টা');
+  }
+  function dhakaNowMin(){
+    try {
+      var p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Dhaka', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+      var h = +p.find(function(x){ return x.type === 'hour'; }).value, m = +p.find(function(x){ return x.type === 'minute'; }).value;
+      return (h % 24) * 60 + m;
+    } catch (e) { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+  }
+  function hoursFor(b){
+    var o = b.open_time || HOURS.open, c = b.close_time || HOURS.close;
+    if (!o || !c) return null;
+    var now = dhakaNowMin(), om = toMin(o), cm = toMin(c);
+    var isOpen = cm > om ? (now >= om && now < cm) : (now >= om || now < cm);
+    return { open: o, close: c, isOpen: isOpen };
+  }
+  function hoursHtml(b){
+    var h = hoursFor(b);
+    if (!h) return '';
+    return '<div class="hours">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
+      '<span>' + fmtTime(h.open) + ' – ' + fmtTime(h.close) + '</span>' +
+      '<span class="open-badge ' + (h.isOpen ? 'is-open' : 'is-closed') + '">' + (h.isOpen ? 'এখন খোলা' : 'এখন বন্ধ') + '</span>' +
+    '</div>';
+  }
+
   function pinIcon(){
     return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B8842E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:3px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
   }
@@ -225,6 +257,7 @@
         '</div>' +
         '<h3>' + esc(b.name) + '</h3>' +
         '<div class="addr">' + pinIcon() + '<span>' + esc(b.address) + '</span></div>' +
+        hoursHtml(b) +
         '<div class="actions">' +
           (tel ? '<a class="call" href="tel:' + esc(tel) + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' + esc(b.phone) + '</a>' : '') +
           '<a class="map" href="' + mapHref + '" target="_blank" rel="noopener">' + (userPos ? 'রাস্তা ↗' : 'মানচিত্র ↗') + '</a>' +
@@ -306,11 +339,21 @@
   render(ALL_BRANCHES);
   searchEl.addEventListener('input', function(){ render(applyFilters()); });
 
+  // অ্যাডমিন সেটিংসে সময়সূচি দেওয়া থাকলে সেটাই সব কার্ডে প্রযোজ্য
+  fetch('/api/settings').then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+    var s = (d && d.settings) || {};
+    if (s.hours_open && s.hours_close) { HOURS.open = s.hours_open; HOURS.close = s.hours_close; }
+    HOURS.note = s.hours_note || '';
+    render(applyFilters());
+  }).catch(function(){});
+  // "এখন খোলা/বন্ধ" প্রতি মিনিটে হালনাগাদ
+  setInterval(function(){ render(applyFilters()); }, 60000);
+
   // অ্যাডমিন প্যানেল থেকে যোগ করা ব্রাঞ্চ থাকলে সেগুলো তালিকায় যোগ হবে
   fetch('/api/branches').then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
     if (!data || !data.branches || !data.branches.length) return;
     var extra = data.branches.map(function(b){
-      var o = { name: b.name, area: b.area || '', address: b.address || '', phone: b.phone || '' };
+      var o = { name: b.name, area: b.area || '', address: b.address || '', phone: b.phone || '', open_time: b.open_time || '', close_time: b.close_time || '' };
       if (b.lat != null && b.lng != null && !isNaN(Number(b.lat)) && !isNaN(Number(b.lng))) { o.lat = Number(b.lat); o.lng = Number(b.lng); }
       return o;
     });

@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'GET' && !wantsAll) {
     const { rows } = await sql`
-      SELECT id, name, area, address, phone, sort_order, active, lat, lng
+      SELECT id, name, area, address, phone, sort_order, active, lat, lng, open_time, close_time
       FROM site_branches
       WHERE active = TRUE
       ORDER BY sort_order ASC, created_at ASC
@@ -29,7 +29,7 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'GET' && wantsAll) {
     const { rows } = await sql`
-      SELECT id, name, area, address, phone, sort_order, active, lat, lng
+      SELECT id, name, area, address, phone, sort_order, active, lat, lng, open_time, close_time
       FROM site_branches
       ORDER BY sort_order ASC, created_at ASC
     `;
@@ -45,7 +45,7 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'POST') {
     const id = newId();
-    const { name, area = '', address = '', phone = '', sortOrder = 0, active = true, lat = null, lng = null } = body;
+    const { name, area = '', address = '', phone = '', sortOrder = 0, active = true, lat = null, lng = null, openTime = '', closeTime = '' } = body;
     const latV = (lat === '' || lat == null || isNaN(Number(lat))) ? null : Number(lat);
     const lngV = (lng === '' || lng == null || isNaN(Number(lng))) ? null : Number(lng);
     if (!name) {
@@ -53,15 +53,16 @@ module.exports = async function handler(req, res) {
       return;
     }
     await sql`
-      INSERT INTO site_branches (id, name, area, address, phone, sort_order, active, lat, lng)
-      VALUES (${id}, ${name}, ${area}, ${address}, ${phone}, ${sortOrder}, ${active}, ${latV}, ${lngV})
+      INSERT INTO site_branches (id, name, area, address, phone, sort_order, active, lat, lng, open_time, close_time)
+      VALUES (${id}, ${name}, ${area}, ${address}, ${phone}, ${sortOrder}, ${active}, ${latV}, ${lngV}, ${openTime || null}, ${closeTime || null})
     `;
     res.status(201).json({ ok: true, id });
     return;
   }
 
   if (req.method === 'PUT') {
-    const { id, name, area, address, phone, sortOrder, active, lat, lng } = body;
+    const { id, name, area, address, phone, sortOrder, active, lat, lng, openTime, closeTime } = body;
+    const setHours = Object.prototype.hasOwnProperty.call(body, 'openTime');
     const setGeo = Object.prototype.hasOwnProperty.call(body, 'lat');
     const latV = (lat === '' || lat == null || isNaN(Number(lat))) ? null : Number(lat);
     const lngV = (lng === '' || lng == null || isNaN(Number(lng))) ? null : Number(lng);
@@ -78,7 +79,9 @@ module.exports = async function handler(req, res) {
         sort_order = COALESCE(${sortOrder}, sort_order),
         active = COALESCE(${active}, active),
         lat = CASE WHEN ${setGeo} THEN ${latV}::double precision ELSE lat END,
-        lng = CASE WHEN ${setGeo} THEN ${lngV}::double precision ELSE lng END
+        lng = CASE WHEN ${setGeo} THEN ${lngV}::double precision ELSE lng END,
+        open_time = CASE WHEN ${setHours} THEN ${openTime || null}::text ELSE open_time END,
+        close_time = CASE WHEN ${setHours} THEN ${closeTime || null}::text ELSE close_time END
       WHERE id = ${id}
     `;
     res.status(200).json({ ok: true });

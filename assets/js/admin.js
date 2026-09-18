@@ -224,6 +224,8 @@
   var bActive = document.getElementById('bActive');
   var bLat = document.getElementById('bLat');
   var bLng = document.getElementById('bLng');
+  var bOpen = document.getElementById('bOpen');
+  var bClose = document.getElementById('bClose');
   var editingBranchId = null;
 
   function loadBranches() {
@@ -275,6 +277,8 @@
     bActive.checked = branch ? !!branch.active : true;
     bLat.value = (branch && branch.lat != null) ? branch.lat : '';
     bLng.value = (branch && branch.lng != null) ? branch.lng : '';
+    bOpen.value = (branch && branch.open_time) ? branch.open_time : '';
+    bClose.value = (branch && branch.close_time) ? branch.close_time : '';
     branchModalBg.classList.add('open');
   }
   function closeBranchModal() { branchModalBg.classList.remove('open'); }
@@ -292,7 +296,9 @@
       phone: bPhone.value.trim(),
       active: bActive.checked,
       lat: bLat.value.trim() === '' ? null : Number(bLat.value.trim()),
-      lng: bLng.value.trim() === '' ? null : Number(bLng.value.trim())
+      lng: bLng.value.trim() === '' ? null : Number(bLng.value.trim()),
+      openTime: bOpen.value || '',
+      closeTime: bClose.value || ''
     };
     var method = editingBranchId ? 'PUT' : 'POST';
     if (editingBranchId) payload.id = editingBranchId;
@@ -427,7 +433,8 @@
     phone: 'sPhone', email: 'sEmail', address: 'sAddress',
     facebook: 'sFacebook', instagram: 'sInstagram', whatsapp: 'sWhatsapp',
     topbar_1: 'sTopbar1', topbar_2: 'sTopbar2', topbar_3: 'sTopbar3',
-    about_intro: 'sAboutIntro', about_history: 'sAboutHistory', credit: 'sCredit'
+    about_intro: 'sAboutIntro', about_history: 'sAboutHistory', credit: 'sCredit',
+    hours_open: 'sHoursOpen', hours_close: 'sHoursClose', hours_note: 'sHoursNote'
   };
 
   function loadSettings() {

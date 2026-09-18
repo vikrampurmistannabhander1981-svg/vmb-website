@@ -52,6 +52,8 @@ async function ensureSchema() {
   `;
   await sql`ALTER TABLE site_branches ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION;`;
   await sql`ALTER TABLE site_branches ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION;`;
+  await sql`ALTER TABLE site_branches ADD COLUMN IF NOT EXISTS open_time TEXT;`;
+  await sql`ALTER TABLE site_branches ADD COLUMN IF NOT EXISTS close_time TEXT;`;
   await seedDefaultProducts();
   schemaReady = true;
 }
