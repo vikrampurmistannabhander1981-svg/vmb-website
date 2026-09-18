@@ -251,16 +251,23 @@
       card.style.animationDelay = Math.min(i, 12) * 40 + 'ms';
       var mapHref = userPos ? ('https://www.google.com/maps/dir/?api=1&origin=' + userPos.lat + ',' + userPos.lng + '&destination=' + encodeURIComponent(b.address)) : mapUrl;
       card.innerHTML =
-        '<div class="top"><span class="area">' + esc(areaLabel(b.area)) + '</span>' +
-          (isHQ(b) ? '<span class="hq-badge">প্রধান কার্যালয়</span>' : '') +
-          (d != null ? '<span class="dist">' + fmtDist(d) + '</span>' : '') +
+        '<div class="card-head v' + ((i % 3) + 1) + '">' +
+          '<span class="head-letter disp" aria-hidden="true">' + esc(areaLabel(b.area).charAt(0)) + '</span>' +
+          '<span class="head-num">' + bn(String(i + 1).padStart(2, '0')) + '</span>' +
+          '<div class="head-badges">' +
+            '<span class="area">' + esc(areaLabel(b.area)) + '</span>' +
+            (isHQ(b) ? '<span class="hq-badge">প্রধান কার্যালয়</span>' : '') +
+            (d != null ? '<span class="dist">' + fmtDist(d) + '</span>' : '') +
+          '</div>' +
         '</div>' +
-        '<h3>' + esc(b.name) + '</h3>' +
-        '<div class="addr">' + pinIcon() + '<span>' + esc(b.address) + '</span></div>' +
-        hoursHtml(b) +
+        '<div class="card-body">' +
+          '<h3 class="disp">' + esc(b.name) + '</h3>' +
+          '<div class="addr">' + pinIcon() + '<span>' + esc(b.address) + '</span></div>' +
+          hoursHtml(b) +
+        '</div>' +
         '<div class="actions">' +
-          (tel ? '<a class="call" href="tel:' + esc(tel) + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' + esc(b.phone) + '</a>' : '') +
-          '<a class="map" href="' + mapHref + '" target="_blank" rel="noopener">' + (userPos ? 'রাস্তা ↗' : 'মানচিত্র ↗') + '</a>' +
+          (tel ? '<a class="call" href="tel:' + esc(tel) + '"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>কল করুন</span><small>' + esc(b.phone) + '</small></a>' : '') +
+          '<a class="map" href="' + mapHref + '" target="_blank" rel="noopener" title="' + (userPos ? 'রাস্তা দেখুন' : 'মানচিত্রে দেখুন') + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>' + (userPos ? 'রাস্তা' : 'ম্যাপ') + '</span></a>' +
         '</div>';
       listEl.appendChild(card);
     });
