@@ -222,7 +222,14 @@
         '</div>';
       grid.insertBefore(card, emptyNote);
     });
+    // নতুন কার্ডে বর্তমান ফিল্টার আবার বসাও
+    var act = document.querySelector('.filter-chip.active'); if (act) act.click();
   }).catch(function(){ /* fallback থেকে যাবে */ });
+
+  // হোমের ক্যাটাগরি কার্ড থেকে ?cat=... নিয়ে এলে সেই ফিল্টারটা আগে থেকেই বাছা থাকবে
+  var wantCat = new URLSearchParams(location.search).get('cat');
+  var preChip = wantCat && document.querySelector('.filter-chip[data-cat="' + wantCat.replace(/[^a-z]/g, '') + '"]');
+  if (preChip) { preChip.click(); preChip.scrollIntoView({ block: 'center' }); }
 
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function bnDigits(n){ return String(n).replace(/[0-9]/g, function(d){ return '০১২৩৪৫৬৭৮৯'[d]; }); }

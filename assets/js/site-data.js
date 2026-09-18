@@ -44,6 +44,11 @@
       if (s[k]) el.textContent = s[k];
     });
 
+    // WhatsApp বাটন (গিফট/অর্ডার CTA) — নম্বর থাকলে তবেই দেখাবে
+    if (s.whatsapp) {
+      document.querySelectorAll('.js-wa').forEach(function (a) { a.href = 'https://wa.me/' + s.whatsapp.replace(/[^d]/g, ''); a.style.display = ''; });
+    }
+
     // সোশ্যাল আইকন (ফুটার) — লিংক থাকলে তবেই দেখাবে
     var social = document.querySelector('.js-social');
     if (social) {
