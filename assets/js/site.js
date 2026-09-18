@@ -8,6 +8,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  var film = document.getElementById('film');
+  if (film) {
+    var fv = document.getElementById('filmVideo');
+    var fp = document.getElementById('filmPlay');
+    fp.addEventListener('click', function () {
+      film.classList.add('playing');
+      fv.setAttribute('controls', '');
+      var p = fv.play(); if (p && p.catch) p.catch(function () {});
+    });
+    fv.addEventListener('ended', function () { film.classList.remove('playing'); fv.removeAttribute('controls'); fv.load(); });
+  }
+
   var fadeItems = document.querySelectorAll('.fade-group > *');
   if (fadeItems.length && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {

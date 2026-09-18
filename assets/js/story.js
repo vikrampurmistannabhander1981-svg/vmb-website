@@ -9,6 +9,10 @@
   var video = story.querySelector('.story-bg video');
   var n = chapters.length;
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var saveData = !!(navigator.connection && navigator.connection.saveData);
+  // ডাটা-সেভার/রিডিউসড-মোশনে ভিডিও বাদ — ছবিগুলোই থাকবে
+  if (video && (reduced || saveData)) { video.remove(); video = null; bgs = bgs.filter(function (b) { return b.tagName !== 'VIDEO'; }); }
+  var loopMode = !!(video && video.getAttribute('data-mode') === 'loop');
   var current = -1;
   var ticking = false;
 
@@ -36,7 +40,9 @@
 
     if (reduced) return;
 
-    if (video && video.duration) {
+    if (video && loopMode) {
+      // লুপ মোড: ভিডিও নিজে চলে; স্ক্রল শুধু অধ্যায় বদলায়
+    } else if (video && video.duration) {
       video.currentTime = progress * video.duration;
     } else {
       // প্রতিটি অধ্যায়ের ভেতরে ছবিটা ধীরে জুম হয় (Ken Burns)
@@ -51,9 +57,25 @@
   }
 
   if (video) {
-    video.classList.add('on');
-    bgs.forEach(function (b) { if (b !== video) b.style.display = 'none'; });
+    // ভিডিও সত্যিই চালু হলে তবেই ছবি লুকাবে — না চললে (পুরনো ব্রাউজার/অটোপ্লে ব্লক) ছবিই থাকবে
+    var videoLive = false;
+    function activateVideo() {
+      if (videoLive) return;
+      videoLive = true;
+      video.classList.add('on');
+      bgs.forEach(function (b) { if (b !== video) b.style.display = 'none'; });
+    }
     video.addEventListener('loadedmetadata', update);
+    if (loopMode) {
+      video.addEventListener('playing', activateVideo, { once: true });
+      var vio = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { var p = video.play(); if (p && p.catch) p.catch(function () {}); }
+        else { video.pause(); }
+      }, { threshold: 0 });
+      vio.observe(story);
+    } else {
+      video.addEventListener('loadeddata', activateVideo, { once: true });
+    }
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });

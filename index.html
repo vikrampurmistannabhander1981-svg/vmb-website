@@ -48,8 +48,8 @@
       <img src="/assets/img/sondesh.jpg" alt="">
       <img src="/assets/img/jilapi.jpg" alt="">
       <img src="/assets/img/plate-2.jpg" alt="">
-      <!-- মিষ্টি বানানোর ভিডিও পেলে নিচের লাইনটা খুলে src বসালেই স্ক্রলের সাথে ভিডিও চলবে -->
-      <!-- <video src="/assets/video/making.mp4" muted playsinline preload="auto"></video> -->
+      <!-- ব্র্যান্ড ভিডিওর টেক্সট-মুক্ত অংশ, muted লুপ; ভিডিও না চললে/ডাটা-সেভারে উপরের ছবিগুলো দেখায় -->
+      <video src="/assets/video/story-ambient.mp4" poster="/assets/img/hero-1.jpg" muted loop playsinline preload="metadata" data-mode="loop"></video>
     </div>
     <div class="story-vignette"></div>
     <canvas class="story-dust" aria-hidden="true"></canvas>
@@ -114,6 +114,26 @@
       <div><b class="disp">45+ Years</b><span>Tradition</span></div>
       <div><b class="disp">Quality First</b><span>Carefully Selected Ingredients</span></div>
       <div><b class="disp">Made Fresh</b><span>Every Day</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="film-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow" style="justify-content:center;">OUR STORY IN MOTION</div>
+      <h2 class="disp">আমাদের গল্প দেখুন</h2>
+      <p style="margin:10px 0 0;color:var(--muted);font-size:14.5px;">কলাবাগানের প্রধান শাখা থেকে — এক মিনিটে বিক্রমপুর মিষ্টান্ন ভান্ডার</p>
+    </div>
+    <div class="film" id="film">
+      <video id="filmVideo" poster="/assets/img/storefront-night.jpg" preload="none" playsinline controlslist="nodownload">
+        <source src="/assets/video/vmb-story.mp4" type="video/mp4">
+      </video>
+      <button class="film-play" id="filmPlay" aria-label="ভিডিও চালান">
+        <span class="ring"></span>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <div class="film-caption"><span class="disp">Since 1981</span> · প্রধান শাখা, কলাবাগান</div>
     </div>
   </div>
 </section>
