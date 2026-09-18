@@ -427,7 +427,7 @@
     phone: 'sPhone', email: 'sEmail', address: 'sAddress',
     facebook: 'sFacebook', instagram: 'sInstagram', whatsapp: 'sWhatsapp',
     topbar_1: 'sTopbar1', topbar_2: 'sTopbar2', topbar_3: 'sTopbar3',
-    about_intro: 'sAboutIntro', about_history: 'sAboutHistory'
+    about_intro: 'sAboutIntro', about_history: 'sAboutHistory', credit: 'sCredit'
   };
 
   function loadSettings() {
