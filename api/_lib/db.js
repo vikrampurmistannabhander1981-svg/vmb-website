@@ -18,6 +18,8 @@ async function ensureSchema() {
     );
   `;
   await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS featured BOOLEAN NOT NULL DEFAULT FALSE;`;
+  await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS price NUMERIC;`;
+  await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS unit TEXT NOT NULL DEFAULT 'কেজি';`;
   await sql`
     CREATE TABLE IF NOT EXISTS site_settings (
       key   TEXT PRIMARY KEY,

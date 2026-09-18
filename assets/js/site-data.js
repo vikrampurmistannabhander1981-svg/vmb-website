@@ -75,6 +75,7 @@
             (p.subtitle ? '<div class="tag">' + esc(p.subtitle) + '</div>' : '') +
             '<h3>' + esc(p.title) + '</h3>' +
             (p.description ? '<p>' + esc(p.description) + '</p>' : '') +
+            ((p.price != null && p.price !== '') ? '<div class="price">৳ ' + bn(p.price) + ' <span>/ ' + esc(p.unit || 'কেজি') + '</span></div>' : '') +
             '<a class="link" href="sweets.html">View Details →</a>' +
           '</div></div>';
       }).join('');

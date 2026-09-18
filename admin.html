@@ -176,6 +176,23 @@
       <label>সংক্ষিপ্ত বিবরণ</label>
       <textarea id="fDescription" placeholder="এক-দুই লাইনের বিবরণ"></textarea>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="field">
+        <label>দাম (টাকা)</label>
+        <input type="number" id="fPrice" min="0" step="1" placeholder="যেমন: 450">
+      </div>
+      <div class="field">
+        <label>একক</label>
+        <select id="fUnit">
+          <option value="কেজি">প্রতি কেজি</option>
+          <option value="পিস">প্রতি পিস</option>
+          <option value="প্যাকেট">প্রতি প্যাকেট</option>
+          <option value="বক্স">প্রতি বক্স</option>
+          <option value="৫০০ গ্রাম">প্রতি ৫০০ গ্রাম</option>
+        </select>
+      </div>
+    </div>
+    <div class="muted-note" style="margin:-8px 0 14px;">দাম ফাঁকা রাখলে সাইটে "অর্ডারের জন্য কল করুন" দেখাবে।</div>
     <div class="field">
       <label><input type="checkbox" id="fActive" checked style="width:auto;margin-right:6px;">সাইটে দেখাবে (Active)</label>
     </div>

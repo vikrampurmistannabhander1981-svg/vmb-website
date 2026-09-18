@@ -26,6 +26,9 @@
   var fDescription = document.getElementById('fDescription');
   var fActive = document.getElementById('fActive');
   var fFeatured = document.getElementById('fFeatured');
+  var fPrice = document.getElementById('fPrice');
+  var fUnit = document.getElementById('fUnit');
+  function fmtPrice(p){ if(p==null||p==='') return ''; return '৳ ' + String(p).replace(/[0-9]/g,function(d){return '০১২৩৪৫৬৭৮৯'[d];}); }
 
   var currentImageData = '';
   var editingId = null;
@@ -92,7 +95,7 @@
       var img = p.image_url ? '<img src="' + p.image_url + '">' : '<div style="width:44px;height:44px;border-radius:8px;background:#eee;"></div>';
       tr.innerHTML =
         '<td>' + img + '</td>' +
-        '<td><b>' + escapeHtml(p.title) + '</b><br><span style="color:var(--muted);font-size:12px;">' + escapeHtml(p.subtitle || '') + '</span></td>' +
+        '<td><b>' + escapeHtml(p.title) + '</b><br><span style="color:var(--muted);font-size:12px;">' + escapeHtml(p.subtitle || '') + '</span>' + (p.price != null ? '<br><span style="color:var(--navy);font-weight:700;font-size:12.5px;">' + fmtPrice(p.price) + ' / ' + escapeHtml(p.unit || 'কেজি') + '</span>' : '') + '</td>' +
         '<td>' + (CAT_LABELS[p.category] || p.category) + '</td>' +
         '<td>' + (p.active ? '✅ Active' : '⛔ Hidden') + (p.featured ? '<br><span style="color:var(--gold);font-size:12px;">★ হোমপেজে</span>' : '') + '</td>' +
         '<td class="row-actions"></td>';
@@ -127,6 +130,8 @@
     fDescription.value = product ? (product.description || '') : '';
     fActive.checked = product ? !!product.active : true;
     fFeatured.checked = product ? !!product.featured : false;
+    fPrice.value = (product && product.price != null) ? product.price : '';
+    fUnit.value = (product && product.unit) ? product.unit : 'কেজি';
     currentImageData = product ? (product.image_url || '') : '';
     imageFile.value = '';
     if (currentImageData) { imgPreview.src = currentImageData; imgPreview.style.display = 'block'; }
@@ -177,7 +182,9 @@
       description: fDescription.value.trim(),
       imageUrl: currentImageData,
       active: fActive.checked,
-      featured: fFeatured.checked
+      featured: fFeatured.checked,
+      price: fPrice.value === '' ? null : Number(fPrice.value),
+      unit: fUnit.value
     };
     var method = editingId ? 'PUT' : 'POST';
     if (editingId) payload.id = editingId;

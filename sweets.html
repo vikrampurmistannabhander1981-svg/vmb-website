@@ -208,11 +208,15 @@
       card.className = 'sweet-card';
       card.setAttribute('data-cat', p.category || 'normal');
       var img = p.image_url ? '<div class="imgwrap"><img src="' + p.image_url + '" alt="' + escapeAttr(p.title) + '"></div>' : '';
+      var priceHtml = (p.price != null && p.price !== '')
+        ? '<div class="price">৳ ' + bnDigits(p.price) + ' <span>/ ' + escapeHtml(p.unit || 'কেজি') + '</span></div>'
+        : '';
       card.innerHTML = img +
         '<div class="body">' +
           (p.subtitle ? '<div class="tag">' + escapeHtml(p.subtitle) + '</div>' : '') +
           '<h3>' + escapeHtml(p.title) + '</h3>' +
           (p.description ? '<p>' + escapeHtml(p.description) + '</p>' : '') +
+          priceHtml +
           '<a class="link" href="tel:01775525296">অর্ডারের জন্য কল করুন →</a>' +
         '</div>';
       grid.insertBefore(card, emptyNote);
@@ -220,6 +224,7 @@
   }).catch(function(){ /* fallback থেকে যাবে */ });
 
   function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function bnDigits(n){ return String(n).replace(/[0-9]/g, function(d){ return '০১২৩৪৫৬৭৮৯'[d]; }); }
   function escapeAttr(s){ return escapeHtml(s); }
 </script>
 </body>
