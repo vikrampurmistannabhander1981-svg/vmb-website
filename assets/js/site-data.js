@@ -70,7 +70,7 @@
       if (!d || !d.products || !d.products.length) return;
       sig.innerHTML = d.products.slice(0, 6).map(function (p) {
         return '<div class="sweet-card in-view">' +
-          (p.image_url ? '<div class="imgwrap"><img src="' + esc(p.image_url) + '" alt="' + esc(p.title) + '"></div>' : '') +
+          (p.image_url ? '<div class="imgwrap"><img src="' + esc(p.image_url) + '" alt="' + esc(p.title) + '"></div>' : '<div class="noimg">' + esc(p.title) + '</div>') +
           '<div class="body">' +
             (p.subtitle ? '<div class="tag">' + esc(p.subtitle) + '</div>' : '') +
             '<h3>' + esc(p.title) + '</h3>' +

@@ -205,9 +205,10 @@
     grid.querySelectorAll('.sweet-card').forEach(function(c){ c.remove(); });
     data.products.forEach(function(p){
       var card = document.createElement('div');
-      card.className = 'sweet-card';
+      // fade-group এর observer পেজ লোডের সময়ই সেট হয়ে যায়, তাই পরে যোগ হওয়া কার্ড সরাসরি দৃশ্যমান রাখতে হয়
+      card.className = 'sweet-card in-view';
       card.setAttribute('data-cat', p.category || 'normal');
-      var img = p.image_url ? '<div class="imgwrap"><img src="' + p.image_url + '" alt="' + escapeAttr(p.title) + '"></div>' : '';
+      var img = p.image_url ? '<div class="imgwrap"><img src="' + p.image_url + '" alt="' + escapeAttr(p.title) + '"></div>' : '<div class="noimg">' + escapeHtml(p.title) + '</div>';
       var priceHtml = (p.price != null && p.price !== '')
         ? '<div class="price">৳ ' + bnDigits(p.price) + ' <span>/ ' + escapeHtml(p.unit || 'কেজি') + '</span></div>'
         : '';
