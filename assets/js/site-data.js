@@ -63,6 +63,18 @@
     if (d && d.settings) applySettings(d.settings);
   }).catch(function () {});
 
+  // ---- ব্রাঞ্চ সংখ্যা: সাইটে দেওয়া ৩৮ + অ্যাডমিন থেকে যোগ করা সক্রিয় ব্রাঞ্চ ----
+  var STATIC_BRANCH_COUNT = (window.VMB_BRANCHES && window.VMB_BRANCHES.length) || 38;
+  fetch('/api/branches').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    var extra = (d && d.branches) ? d.branches.length : 0;
+    if (!extra) return;
+    var total = bn(STATIC_BRANCH_COUNT + extra) + 'টি';
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    var n, nodes = [];
+    while ((n = walker.nextNode())) { if (n.nodeValue.indexOf('৩৮টি') !== -1) nodes.push(n); }
+    nodes.forEach(function (node) { node.nodeValue = node.nodeValue.split('৩৮টি').join(total); });
+  }).catch(function () {});
+
   // ---- হোমপেজ: ফিচার্ড মিষ্টি ----
   var sig = document.getElementById('signatureGrid');
   if (sig) {
