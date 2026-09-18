@@ -40,22 +40,66 @@
   </div>
 </header>
 
-<section class="hero">
-  <img class="bg" src="assets/img/hero-1.jpg" alt="বিক্রমপুর মিষ্টান্ন ভান্ডারের মিষ্টি">
-  <div class="overlay"></div>
-  <div class="wrap">
-    <div class="content">
-      <div class="eyebrow"><span class="bar"></span>SINCE 1981</div>
-      <h1 class="disp hero-word">VIKRAMPUR<br>MISTANNA BHANDER</h1>
-      <p class="hero-tagline">A Tradition of Taste &amp; Trust</p>
-      <p>১৯৮১ সাল থেকে খাঁটি ঘি, খাঁটি দুধ আর বিক্রমপুরের আসল রেসিপিতে তৈরি মিষ্টি — লক্ষাধিক সন্তুষ্ট ক্রেতার আস্থার ঠিকানা।</p>
+<section class="story" id="story" aria-label="আমাদের গল্প">
+  <div class="story-pin">
+    <div class="story-bg">
+      <img src="assets/img/hero-1.jpg" alt="" class="on">
+      <img src="assets/img/khirsha.jpg" alt="">
+      <img src="assets/img/sondesh.jpg" alt="">
+      <img src="assets/img/jilapi.jpg" alt="">
+      <img src="assets/img/plate-2.jpg" alt="">
+      <!-- মিষ্টি বানানোর ভিডিও পেলে নিচের লাইনটা খুলে src বসালেই স্ক্রলের সাথে ভিডিও চলবে -->
+      <!-- <video src="assets/video/making.mp4" muted playsinline preload="auto"></video> -->
+    </div>
+    <div class="story-vignette"></div>
+    <canvas class="story-dust" aria-hidden="true"></canvas>
+    <div class="story-grain"></div>
+
+    <div class="story-chapter on">
+      <div class="kicker">০১ — শুরু</div>
+      <h1 class="disp">ঢাকা কলেজের পাশে,<br><em>১৯৮১</em> সালে</h1>
+      <p class="en">Where it all began</p>
+      <p class="lead">রমেশ চন্দ্র ঘোষের ছোট্ট এক দোকান থেকে শুরু। আজ ঢাকাজুড়ে ৩৮টি ব্রাঞ্চ, লক্ষাধিক ক্রেতার আস্থা।</p>
+    </div>
+
+    <div class="story-chapter">
+      <div class="kicker">০২ — উপকরণ</div>
+      <h2 class="disp">খাঁটি ঘি, খাঁটি দুধ,<br><em>খাঁটি</em> ছানা</h2>
+      <p class="en">Pure, carefully selected ingredients</p>
+      <p class="lead">এই তিনটি ছাড়া আমাদের কোনো মিষ্টি তৈরি হয় না। মাটির পাত্রে ধীরে জ্বাল দেওয়া দুধ থেকেই জন্ম নেয় ক্ষীরসা।</p>
+    </div>
+
+    <div class="story-chapter">
+      <div class="kicker">০৩ — কারিগরি</div>
+      <h2 class="disp">হাতে গড়া,<br>ছাঁচে <em>নিখুঁত</em></h2>
+      <p class="en">Handcrafted, four decades of skill</p>
+      <p class="lead">প্রতিটি সন্দেশ ছাঁচে গড়া, প্রতিটি কাঁচাগোল্লা হাতে বানানো — বিক্রমপুরের আসল রেসিপি, প্রজন্মের পর প্রজন্ম ধরে অক্ষুণ্ণ।</p>
+    </div>
+
+    <div class="story-chapter">
+      <div class="kicker">০৪ — প্রতিদিন</div>
+      <h2 class="disp">প্রতিদিন সকালে,<br><em>তাজা</em> তৈরি</h2>
+      <p class="en">Made fresh, every single day</p>
+      <p class="lead">বাসি রাখা হয় না। গরম-গরম জিলাপি থেকে নরম চমচম — যা পান, সব আজকের।</p>
+    </div>
+
+    <div class="story-chapter">
+      <div class="kicker">০৫ — আপনার জন্য</div>
+      <h2 class="disp">বাঙালির প্রতিটি<br><em>মিষ্টি</em> মুহূর্তে</h2>
+      <p class="en">A Tradition of Taste &amp; Trust</p>
+      <p class="lead">উৎসব, পার্বণ, অতিথি আপ্যায়ন — ৪৫ বছর ধরে আপনার আনন্দের সঙ্গী বিক্রমপুর মিষ্টান্ন ভান্ডার।</p>
       <div class="cta-row">
         <a href="sweets.html" class="btn-gold" style="padding:15px 30px;font-size:15px;">Explore Our Sweets</a>
         <a href="branches.html" class="btn-outline">Our Branches</a>
       </div>
     </div>
+
+    <div class="story-progress" aria-hidden="true">
+      <span class="on"></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="story-hint">Scroll</div>
   </div>
-  <div class="wave">
+  <div class="story-wave">
     <svg viewBox="0 0 1200 44" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M0,22 C200,44 400,0 600,16 C800,32 1000,4 1200,22 L1200,44 L0,44 Z" fill="#FFFFFF"></path>
     </svg>
@@ -73,14 +117,6 @@
     </div>
   </div>
 </section>
-
-<div class="stats">
-  <div class="wrap">
-    <div class="stat"><b>৪৫+ বছর</b><span>১৯৮১ সাল থেকে চলমান ঐতিহ্য</span></div>
-    <div class="stat"><b>৩৮টি ব্রাঞ্চ</b><span>ঢাকাজুড়ে ছড়িয়ে আছি আপনার কাছে</span></div>
-    <div class="stat"><b>লক্ষাধিক</b><span>সন্তুষ্ট ক্রেতার আস্থা</span></div>
-  </div>
-</div>
 
 <section class="section" id="categories">
   <div class="wrap">
@@ -255,5 +291,6 @@
 </footer>
 
 <script src="assets/js/site.js"></script>
+<script src="assets/js/story.js"></script>
 </body>
 </html>
