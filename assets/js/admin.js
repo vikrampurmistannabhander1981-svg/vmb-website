@@ -25,6 +25,7 @@
   var fCategory = document.getElementById('fCategory');
   var fDescription = document.getElementById('fDescription');
   var fActive = document.getElementById('fActive');
+  var fFeatured = document.getElementById('fFeatured');
 
   var currentImageData = '';
   var editingId = null;
@@ -34,6 +35,8 @@
     adminScreen.style.display = 'block';
     loadProducts();
     loadBranches();
+    loadReviews();
+    loadSettings();
   }
 
   document.querySelectorAll('.tab-btn').forEach(function (btn) {
@@ -91,7 +94,7 @@
         '<td>' + img + '</td>' +
         '<td><b>' + escapeHtml(p.title) + '</b><br><span style="color:var(--muted);font-size:12px;">' + escapeHtml(p.subtitle || '') + '</span></td>' +
         '<td>' + (CAT_LABELS[p.category] || p.category) + '</td>' +
-        '<td>' + (p.active ? '✅ Active' : '⛔ Hidden') + '</td>' +
+        '<td>' + (p.active ? '✅ Active' : '⛔ Hidden') + (p.featured ? '<br><span style="color:var(--gold);font-size:12px;">★ হোমপেজে</span>' : '') + '</td>' +
         '<td class="row-actions"></td>';
       var actionsTd = tr.querySelector('.row-actions');
       var editBtn = document.createElement('button');
@@ -123,6 +126,7 @@
     fCategory.value = product ? product.category : 'normal';
     fDescription.value = product ? (product.description || '') : '';
     fActive.checked = product ? !!product.active : true;
+    fFeatured.checked = product ? !!product.featured : false;
     currentImageData = product ? (product.image_url || '') : '';
     imageFile.value = '';
     if (currentImageData) { imgPreview.src = currentImageData; imgPreview.style.display = 'block'; }
@@ -172,7 +176,8 @@
       category: fCategory.value,
       description: fDescription.value.trim(),
       imageUrl: currentImageData,
-      active: fActive.checked
+      active: fActive.checked,
+      featured: fFeatured.checked
     };
     var method = editingId ? 'PUT' : 'POST';
     if (editingId) payload.id = editingId;
@@ -297,6 +302,157 @@
       .then(function (r) { return r.json(); })
       .then(function () { loadBranches(); });
   }
+
+  // ================= রিভিউ ব্যবস্থাপনা =================
+  var reviewRows = document.getElementById('reviewRows');
+  var reviewListErr = document.getElementById('reviewListErr');
+  var addReviewBtn = document.getElementById('addReviewBtn');
+  var reviewModalBg = document.getElementById('reviewModalBg');
+  var reviewModalTitle = document.getElementById('reviewModalTitle');
+  var reviewFormErr = document.getElementById('reviewFormErr');
+  var reviewCancelBtn = document.getElementById('reviewCancelBtn');
+  var reviewSaveBtn = document.getElementById('reviewSaveBtn');
+  var rName = document.getElementById('rName');
+  var rLocation = document.getElementById('rLocation');
+  var rRating = document.getElementById('rRating');
+  var rText = document.getElementById('rText');
+  var rActive = document.getElementById('rActive');
+  var editingReviewId = null;
+
+  function stars(n) { return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); }
+
+  function loadReviews() {
+    reviewListErr.textContent = '';
+    fetch('/api/reviews?all=1')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { renderReviewRows(d.reviews || []); })
+      .catch(function () { reviewListErr.textContent = 'তালিকা লোড করা যায়নি।'; });
+  }
+
+  function renderReviewRows(reviews) {
+    reviewRows.innerHTML = '';
+    if (!reviews.length) {
+      reviewRows.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">এখনো কোনো রিভিউ যোগ করা হয়নি।</td></tr>';
+      return;
+    }
+    reviews.forEach(function (rv) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><b>' + escapeHtml(rv.name) + '</b></td>' +
+        '<td>' + escapeHtml(rv.location || '') + '</td>' +
+        '<td style="color:var(--gold);white-space:nowrap;">' + stars(rv.rating) + '</td>' +
+        '<td style="max-width:260px;">' + escapeHtml(rv.text) + '</td>' +
+        '<td>' + (rv.active ? '✅ Active' : '⛔ Hidden') + '</td>' +
+        '<td class="row-actions"></td>';
+      var actionsTd = tr.querySelector('.row-actions');
+      var editBtn = document.createElement('button');
+      editBtn.className = 'btn-outline-s';
+      editBtn.textContent = 'এডিট';
+      editBtn.addEventListener('click', function () { openReviewModal(rv); });
+      var delBtn = document.createElement('button');
+      delBtn.className = 'btn-outline-s';
+      delBtn.textContent = 'ডিলিট';
+      delBtn.addEventListener('click', function () { deleteReview(rv.id, rv.name); });
+      actionsTd.appendChild(editBtn);
+      actionsTd.appendChild(delBtn);
+      reviewRows.appendChild(tr);
+    });
+  }
+
+  function openReviewModal(rv) {
+    reviewFormErr.textContent = '';
+    editingReviewId = rv ? rv.id : null;
+    reviewModalTitle.textContent = rv ? 'রিভিউ এডিট করুন' : 'নতুন রিভিউ';
+    rName.value = rv ? rv.name : '';
+    rLocation.value = rv ? (rv.location || '') : '';
+    rRating.value = rv ? String(rv.rating) : '5';
+    rText.value = rv ? rv.text : '';
+    rActive.checked = rv ? !!rv.active : true;
+    reviewModalBg.classList.add('open');
+  }
+  function closeReviewModal() { reviewModalBg.classList.remove('open'); }
+  addReviewBtn.addEventListener('click', function () { openReviewModal(null); });
+  reviewCancelBtn.addEventListener('click', closeReviewModal);
+
+  reviewSaveBtn.addEventListener('click', function () {
+    reviewFormErr.textContent = '';
+    if (!rName.value.trim() || !rText.value.trim()) { reviewFormErr.textContent = 'নাম ও মন্তব্য আবশ্যক।'; return; }
+    var payload = {
+      name: rName.value.trim(),
+      location: rLocation.value.trim(),
+      rating: parseInt(rRating.value, 10),
+      text: rText.value.trim(),
+      active: rActive.checked
+    };
+    var method = editingReviewId ? 'PUT' : 'POST';
+    if (editingReviewId) payload.id = editingReviewId;
+    fetch('/api/reviews', {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) { reviewFormErr.textContent = res.d.error || 'সেভ করা যায়নি।'; return; }
+        closeReviewModal();
+        loadReviews();
+      })
+      .catch(function () { reviewFormErr.textContent = 'নেটওয়ার্ক সমস্যা।'; });
+  });
+
+  function deleteReview(id, name) {
+    if (!confirm('"' + name + '" এর রিভিউ ডিলিট করবেন?')) return;
+    fetch('/api/reviews?id=' + encodeURIComponent(id), { method: 'DELETE' })
+      .then(function (r) { return r.json(); })
+      .then(function () { loadReviews(); });
+  }
+
+  // ================= সাইট সেটিংস =================
+  var settingsErr = document.getElementById('settingsErr');
+  var settingsOk = document.getElementById('settingsOk');
+  var saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  var SETTING_FIELDS = {
+    phone: 'sPhone', email: 'sEmail', address: 'sAddress',
+    facebook: 'sFacebook', instagram: 'sInstagram', whatsapp: 'sWhatsapp',
+    topbar_1: 'sTopbar1', topbar_2: 'sTopbar2', topbar_3: 'sTopbar3',
+    about_intro: 'sAboutIntro', about_history: 'sAboutHistory'
+  };
+
+  function loadSettings() {
+    settingsErr.textContent = '';
+    fetch('/api/settings')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var s = d.settings || {};
+        Object.keys(SETTING_FIELDS).forEach(function (k) {
+          var el = document.getElementById(SETTING_FIELDS[k]);
+          if (el) el.value = s[k] || '';
+        });
+      })
+      .catch(function () { settingsErr.textContent = 'সেটিংস লোড করা যায়নি।'; });
+  }
+
+  saveSettingsBtn.addEventListener('click', function () {
+    settingsErr.textContent = '';
+    settingsOk.textContent = '';
+    var settings = {};
+    Object.keys(SETTING_FIELDS).forEach(function (k) {
+      var el = document.getElementById(SETTING_FIELDS[k]);
+      settings[k] = el ? el.value.trim() : '';
+    });
+    saveSettingsBtn.disabled = true;
+    fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ settings: settings })
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        saveSettingsBtn.disabled = false;
+        if (!res.ok) { settingsErr.textContent = res.d.error || 'সেভ করা যায়নি।'; return; }
+        settingsOk.textContent = '✅ সেটিংস সেভ হয়েছে — সাইটে ১ মিনিটের মধ্যে দেখা যাবে।';
+        setTimeout(function () { settingsOk.textContent = ''; }, 4000);
+      })
+      .catch(function () { saveSettingsBtn.disabled = false; settingsErr.textContent = 'নেটওয়ার্ক সমস্যা।'; });
+  });
 
   // পেজ লোডে সেশন আছে কিনা চেক (products?all=1 কল করেই বোঝা যায়)
   fetch('/api/products?all=1').then(function (r) {
