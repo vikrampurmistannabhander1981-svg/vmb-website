@@ -90,10 +90,10 @@ body.over-story nav.main.open-mobile{background:rgba(20,8,11,.95);}
   background-image:radial-gradient(circle at 1px 1px, #fff 1px, transparent 1.2px);background-size:3px 3px;}
 .story-chapter{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + 30px));padding:0 24px;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s ease, transform .3s ease;}
 .story-chapter.on{opacity:1;transform:translateY(-50%);pointer-events:auto;transition:opacity .8s ease .25s, transform .8s ease .25s;}
-.story-chapter .kicker{color:var(--gold);font-weight:700;font-size:12.5px;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:12px;}
-.story-chapter .kicker::before, .story-chapter .kicker::after{content:'';width:34px;height:1px;background:var(--gold);opacity:.7;}
-.story-chapter h2{margin:0 0 6px;color:#fff;font-size:clamp(38px,6.4vw,84px);line-height:1.04;font-weight:600;letter-spacing:-.5px;text-shadow:0 6px 30px rgba(0,0,0,.45);}
-.story-chapter h2 em{font-style:italic;color:var(--gold);font-weight:500;}
+.story-chapter .kicker{color:#E3B667;font-weight:700;font-size:clamp(13px,1.1vw,16px);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:14px;text-shadow:0 2px 12px rgba(0,0,0,.6);}
+.story-chapter .kicker::before, .story-chapter .kicker::after{content:'';width:38px;height:1px;background:#E3B667;opacity:.85;}
+.story-chapter h1, .story-chapter h2{margin:0 0 6px;color:#fff;font-size:clamp(38px,6.4vw,84px);line-height:1.12;font-weight:600;word-spacing:.08em;text-shadow:0 6px 30px rgba(0,0,0,.5);}
+.story-chapter h1 em, .story-chapter h2 em{font-style:normal;color:#E3B667;font-weight:600;margin-right:.18em;}
 .story-chapter .en{color:rgba(255,255,255,.55);font-family:'Fraunces',serif;font-style:italic;font-size:clamp(15px,1.6vw,20px);margin:0 0 20px;}
 .story-chapter p.lead{margin:0 auto;max-width:560px;color:#E7DFD3;font-size:clamp(14.5px,1.35vw,17.5px);line-height:1.85;}
 .story-chapter .cta-row{justify-content:center;margin-top:28px;}
